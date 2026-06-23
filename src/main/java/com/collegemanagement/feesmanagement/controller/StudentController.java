@@ -1,6 +1,7 @@
 package com.collegemanagement.feesmanagement.controller;
 
 import com.collegemanagement.feesmanagement.entity.Student;
+import com.collegemanagement.feesmanagement.exception.StudentNotFoundException;
 import com.collegemanagement.feesmanagement.services.StudentServices;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class StudentController {
 
     @GetMapping("/students/{id}")
     public Student fetchStudentById(@PathVariable Integer id){
+
         return services.fetchStudentById(id);
     }
 

@@ -2,6 +2,8 @@ package com.collegemanagement.feesmanagement.services.impl;
 
 import com.collegemanagement.feesmanagement.entity.Fees;
 import com.collegemanagement.feesmanagement.entity.Student;
+import com.collegemanagement.feesmanagement.exception.FeesRecordNotFoundException;
+import com.collegemanagement.feesmanagement.exception.StudentNotFoundException;
 import com.collegemanagement.feesmanagement.repository.FeesRepository;
 import com.collegemanagement.feesmanagement.repository.StudentRepository;
 import com.collegemanagement.feesmanagement.services.FeesServices;
@@ -18,7 +20,7 @@ public class FeesServicesImpl implements FeesServices {
 
     @Override
     public Fees insertFees(Integer sid, Fees fees) {
-        Student student = studentRepository.getReferenceById(sid);
+        Student student = studentRepository.findById(sid).orElseThrow(()-> new StudentNotFoundException("Student with id "+sid+" doesn't exist"));
 
         fees.setStudent(student);
         return feesRepository.save(fees);
@@ -31,12 +33,13 @@ public class FeesServicesImpl implements FeesServices {
 
     @Override
     public Fees fetchFeesById(Integer id) {
-        return feesRepository.findById(id).get();
+
+        return feesRepository.findById(id).orElseThrow(()->new FeesRecordNotFoundException("Fees record with id "+id+" doesn't exist"));
     }
 
     @Override
     public Fees updateFeesDetails(Integer id, Fees fees) {
-        Fees existingFees = feesRepository.findById(id).get();
+        Fees existingFees = feesRepository.findById(id).orElseThrow(()-> new FeesRecordNotFoundException("Fees record with id "+id+" doesn't exist"));
         if(fees.getReceiptNumber() != null){
             existingFees.setReceiptNumber(fees.getReceiptNumber());
         }
@@ -65,6 +68,11 @@ public class FeesServicesImpl implements FeesServices {
 
     @Override
     public void removeFeesEntry(Integer id) {
+
+        if(!feesRepository.existsById(id)){
+            throw new FeesRecordNotFoundException("Fees record with id "+id+" doesn't exist");
+        }
+
         feesRepository.deleteById(id);
     }
 }

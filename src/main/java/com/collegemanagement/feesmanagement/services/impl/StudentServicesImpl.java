@@ -3,6 +3,8 @@ package com.collegemanagement.feesmanagement.services.impl;
 
 import com.collegemanagement.feesmanagement.entity.Course;
 import com.collegemanagement.feesmanagement.entity.Student;
+import com.collegemanagement.feesmanagement.exception.CourseNotFoundException;
+import com.collegemanagement.feesmanagement.exception.StudentNotFoundException;
 import com.collegemanagement.feesmanagement.repository.CourseRepository;
 import com.collegemanagement.feesmanagement.repository.StudentRepository;
 import com.collegemanagement.feesmanagement.services.StudentServices;
@@ -20,7 +22,9 @@ public class StudentServicesImpl implements StudentServices {
     @Override
     public Student insertStudent(Integer courseId, Student student) {
         Course course = courseRepository.findById(courseId).get();
-
+        if(course == null){
+            throw new CourseNotFoundException("course with id "+courseId+" doesn't exist");
+        }
         student.setCourse(course);
         return studentRepository.save(student);
     }
@@ -32,12 +36,16 @@ public class StudentServicesImpl implements StudentServices {
 
     @Override
     public Student fetchStudentById(Integer id) {
-        return studentRepository.findById(id).get();
+
+        return studentRepository.findById(id).orElseThrow(()-> new  StudentNotFoundException("student with id "+id+" doesn't exist."));
     }
 
     @Override
     public Student updateStudentDetails(Integer id, Student student) {
         Student existingStudent = studentRepository.getReferenceById(id);
+        if(existingStudent == null){
+            throw new StudentNotFoundException("Student with id "+id+" doesn't exist.");
+        }
         if(student.getAdmissionNumber() != null){
             existingStudent.setAdmissionNumber(student.getAdmissionNumber());
         }
@@ -70,7 +78,11 @@ public class StudentServicesImpl implements StudentServices {
 
     @Override
     public void removeStudent(Integer id) {
-        studentRepository.deleteById(id);
+        Student student = studentRepository.getReferenceById(id);
+        if(student == null){
+            throw new StudentNotFoundException("student with id "+id+" doesn't exist.");
+        }
+        studentRepository.delete(student);
     }
 
 }
