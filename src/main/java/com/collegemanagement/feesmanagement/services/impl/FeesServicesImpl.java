@@ -8,8 +8,10 @@ import com.collegemanagement.feesmanagement.repository.FeesRepository;
 import com.collegemanagement.feesmanagement.repository.StudentRepository;
 import com.collegemanagement.feesmanagement.services.FeesServices;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -19,11 +21,27 @@ public class FeesServicesImpl implements FeesServices {
     private StudentRepository studentRepository;
 
     @Override
-    public Fees insertFees(Integer sid, Fees fees) {
+    public Fees insertFees(Integer sid, Fees newFeesEntry) {
         Student student = studentRepository.findById(sid).orElseThrow(()-> new StudentNotFoundException("Student with id "+sid+" doesn't exist"));
 
-        fees.setStudent(student);
-        return feesRepository.save(fees);
+        Double totalCourseFees = student.getCourse().getTotalFees();
+
+        List<Fees> pastFees = student.getFees();
+        double totalPreviouslyPaid = 0.0;
+        if(pastFees != null){
+            totalPreviouslyPaid = pastFees.stream().mapToDouble(fees -> fees.getPaidAmount() != null ? fees.getPaidAmount() : 0.0).sum();
+        }
+
+        Double currentPayment = newFeesEntry.getPaidAmount();
+        if(currentPayment == null)
+            currentPayment = 0.0;
+
+        double newTotalPaidAmount = totalPreviouslyPaid + currentPayment;
+        double currentRemainigAmount = totalCourseFees - newTotalPaidAmount;
+        newFeesEntry.setRemainingAmount(currentRemainigAmount);
+        newFeesEntry.setPaidAmount(newTotalPaidAmount);
+        newFeesEntry.setStudent(student);
+        return feesRepository.save(newFeesEntry);
     }
 
     @Override
@@ -75,4 +93,11 @@ public class FeesServicesImpl implements FeesServices {
 
         feesRepository.deleteById(id);
     }
+
+    @Override
+    public List<Fees> fetchFeesBetweenDates(LocalDate startDate, LocalDate endDate) {
+        return feesRepository.findByPaymentDateBetween(startDate, endDate);
+    }
+
+
 }

@@ -10,4 +10,5 @@ public interface StudentServices {
     public Student fetchStudentById(Integer id);
     public Student updateStudentDetails(Integer id, Student student);
     public void removeStudent(Integer id);
+    public List<Student> getPendingStudentsList();
 }

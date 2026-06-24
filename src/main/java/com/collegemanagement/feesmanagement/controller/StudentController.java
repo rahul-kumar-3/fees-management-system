@@ -38,4 +38,8 @@ public class StudentController {
     public Student insertStudent(@PathVariable Integer cid, @RequestBody Student student){
         return services.insertStudent(cid, student);
     }
+    @GetMapping("/students/pending-amount")
+    public List<Student> getPendingStudentsList(){
+        return services.getPendingStudentsList();
+    }
 }

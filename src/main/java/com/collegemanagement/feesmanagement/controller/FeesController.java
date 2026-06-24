@@ -3,8 +3,10 @@ package com.collegemanagement.feesmanagement.controller;
 import com.collegemanagement.feesmanagement.entity.Fees;
 import com.collegemanagement.feesmanagement.services.FeesServices;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -38,5 +40,8 @@ public class FeesController {
         feesServices.removeFeesEntry(id);
     }
 
-
+    @GetMapping("/fees/{startDate}/{endDate}")
+    public List<Fees> fetchFeesBetweenDates(@PathVariable("startDate") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate, @PathVariable("endDate") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate endDate){
+        return feesServices.fetchFeesBetweenDates(startDate, endDate);
+    }
 }
