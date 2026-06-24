@@ -9,8 +9,11 @@ import com.collegemanagement.feesmanagement.exception.StudentNotFoundException;
 import com.collegemanagement.feesmanagement.repository.CourseRepository;
 import com.collegemanagement.feesmanagement.repository.FeesRepository;
 import com.collegemanagement.feesmanagement.repository.StudentRepository;
+import com.collegemanagement.feesmanagement.response.ApiResponseHandler;
 import com.collegemanagement.feesmanagement.services.StudentServices;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -70,6 +73,11 @@ public class StudentServicesImpl implements StudentServices {
         }
         if(student.getAdmissionDate() != null){
             existingStudent.setAdmissionDate(student.getAdmissionDate());
+        }
+
+        if(student.getCourse() != null){
+            Course course = courseRepository.findById(student.getCourse().getCourseId()).orElseThrow(() -> new CourseNotFoundException("course with id "+student.getCourse().getCourseId()+" doesn't exist."));
+            existingStudent.setCourse(course);
         }
         return studentRepository.save(existingStudent);
     }

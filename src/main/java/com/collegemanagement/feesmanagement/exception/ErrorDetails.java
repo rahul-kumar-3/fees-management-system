@@ -9,13 +9,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ErrorDetails {
     private LocalDateTime timestamp;
+    private boolean success;
     private Integer status;
     private String error;
     private String message;
     private Throwable exception;
 
-    public ErrorDetails(LocalDateTime timeStamp, int status, String error, String message, Throwable ex) {
+    public ErrorDetails(LocalDateTime timeStamp,boolean success, int status, String error, String message, Throwable ex) {
         this.timestamp = timeStamp;
+        this.success = success;
         this.status = status;
         this.error = error;
         this.message = message;
